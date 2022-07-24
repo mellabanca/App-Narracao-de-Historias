@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, SafeAreaView, Image, StatusBar, Platform } from 'react-native';
 import { FlatList } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
 
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import StoryCard from "./StoryCard";
 import firebase from "firebase";
 
-let stories = require("./temp.json")
+//let stories = require("./temp.json")
 
 let customFonts = {
   'Bubblegum-Sans': require("../assets/fonts/BubblegumSans-Regular.ttf"),
@@ -18,7 +19,8 @@ export default class Feed extends Component {
     super(props);
     this.state = {
       fontsLoaded: false,
-      light_theme: true
+      light_theme: true,
+      stories: []
     }
   }
 
@@ -30,6 +32,7 @@ export default class Feed extends Component {
   componentDidMount(){
     this._loadFontsAsync();
     this.fetchUser();
+    this.fetchStories();
   }
 
   fetchUser = () => {
@@ -41,6 +44,29 @@ export default class Feed extends Component {
         theme = snapshot.val().current_theme;
         this.setState({ light_theme: theme === "light" });
       });
+  };
+
+  fetchStories = () => {
+    firebase
+      .database()
+      .ref("/posts/")
+      .on("value", snapshot => {
+          let stories = [];
+          if (snapshot.val()) {
+            Object.keys(snapshot.val()).forEach(function(key) {
+              stories.push({
+                key: key,
+                value: snapshot.val()[key]
+              });
+            });
+          }
+          this.setState({ stories: stories });
+          this.props.setUpdateToFalse()
+        },
+        function (errorObject) {
+          console.log("A leitura falhou: " + errorObject.code);
+        }
+      );
   };
 
   renderItem = ({item: story}) => {
@@ -66,13 +92,21 @@ export default class Feed extends Component {
                     <Text style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>App Narração de Histórias</Text>
                   </View>
               </View>
-              <View style={styles.cardContainer}>
+              {
+                !this.state.stories[0] ?
+                <View style={styles.noStories}>
+                  <Text style={this.state.light_theme ? styles.noStoriesTextLight : styles.noStoriesText}>
+                    Nenhuma história disponível
+                  </Text>
+                </View>
+                : <View style={styles.cardContainer}>
                 <FlatList
                   keyExtractor={this.keyExtractor}
-                  data={stories}
+                  data={this.state.stories}
                   renderItem={this.renderItem}
                 />
               </View>
+              }
             </View>
         )
     }
@@ -121,5 +155,20 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 0.93
+  },
+  noStories:{
+    flex: 0.85,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noStoriesText: {
+     color: "white",
+    fontSize: RFValue(40),
+    fontFamily: "Bubblegum-Sans",
+  },
+  noStoriesTextLight: {
+    color: "#15193c",
+    fontSize: RFValue(40),
+    fontFamily: "Bubblegum-Sans",
   }
 })

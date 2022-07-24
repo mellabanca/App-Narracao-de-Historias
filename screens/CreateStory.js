@@ -9,13 +9,16 @@ import {
   Image,
   ScrollView,
   TextInput,
-  Dimensions
+  Dimensions,
+  Button,
+  Alert
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import firebase from "firebase";
+import moment from 'moment';
 
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
@@ -53,6 +56,35 @@ export default class CreateStory extends Component {
       });
   };
 
+  async addStory(){
+    if(this.state.title && this.state.description &&
+       this.state.story && this.state.moral){
+        let storyData = {
+          preview_image: this.state.previewImage,
+          title: this.state.title,
+          description: this.state.description,
+          story: this.state.story,
+          moral: this.state.moral,
+          author: firebase.auth().currentUser.displayName,
+          created_on: moment().format('LL'),
+          author_uid: firebase.auth().currentUser.uid,
+          likes: 0
+        }
+        await firebase
+              .database()
+              .ref("/posts/" + (Math.random().toString(36).slice(2)))
+              .set(storyData)
+              .then(function(snapshot){})
+              this.props.setUpdateToTrue()
+              this.props.navigation.navigate("Feed")
+    } else {
+      Alert.alert("Erro","Todos os campos são obrigatórios!",
+                  [{text: "OK", onPress: ()=> console.log("Ok pressionado")}],
+                  {cancelable: false}
+                  )
+    }
+  }
+
   render() {
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
@@ -80,23 +112,15 @@ export default class CreateStory extends Component {
             </View>
             <View style={styles.appTitleTextContainer}>
               <Text
-                style={
-                  this.state.light_theme
-                    ? styles.appTitleTextLight
-                    : styles.appTitleText
-                }
-              >
+                style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>
                 Nova História
               </Text>
             </View>
           </View>
           <View style={styles.fieldsContainer}>
             <ScrollView>
-              <Image
-                source={preview_images[this.state.previewImage]}
-                style={styles.previewImage}
-              ></Image>
-
+              <Image source={preview_images[this.state.previewImage]}
+                     style={styles.previewImage}></Image>
               <View style={{ height: RFValue(this.state.dropdownHeight) }}>
                 <DropDownPicker
                   items={[
@@ -126,16 +150,8 @@ export default class CreateStory extends Component {
                   dropDownStyle={{
                     backgroundColor: this.state.light_theme ? "#eee" : "#2f345d"
                   }}
-                  labelStyle={
-                    this.state.light_theme
-                      ? styles.dropdownLabelLight
-                      : styles.dropdownLabel
-                  }
-                  arrowStyle={
-                    this.state.light_theme
-                      ? styles.dropdownLabelLight
-                      : styles.dropdownLabel
-                  }
+                  labelStyle={this.state.light_theme ? styles.dropdownLabelLight : styles.dropdownLabel}
+                  arrowStyle={this.state.light_theme ? styles.dropdownLabelLight : styles.dropdownLabel}
                   onChangeItem={item =>
                     this.setState({
                       previewImage: item.value
@@ -145,65 +161,42 @@ export default class CreateStory extends Component {
               </View>
               <View style={{ marginHorizontal: RFValue(10) }}>
                 <TextInput
-                  style={
-                    this.state.light_theme
-                      ? styles.inputFontLight
-                      : styles.inputFont
-                  }
+                  style={this.state.light_theme ? styles.inputFontLight : styles.inputFont}
                   onChangeText={title => this.setState({ title })}
                   placeholder={"Ttítulo"}
-                  placeholderTextColor={
-                    this.state.light_theme ? "#15193c" : "white"
-                  }
+                  placeholderTextColor={this.state.light_theme ? "#15193c" : "white"}
                 />
                 <TextInput
-                  style={[
-                    this.state.light_theme
-                      ? styles.inputFontLight
-                      : styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig
-                  ]}
+                  style={[this.state.light_theme ? styles.inputFontLight : styles.inputFont,
+                          styles.inputFontExtra, styles.inputTextBig]}
                   onChangeText={description => this.setState({ description })}
                   placeholder={"Descrição"}
                   multiline={true}
                   numberOfLines={4}
-                  placeholderTextColor={
-                    this.state.light_theme ? "#15193c" : "white"
-                  }
+                  placeholderTextColor={this.state.light_theme ? "#15193c" : "white"}
                 />
-                <TextInput
-                  style={[
-                    this.state.light_theme
-                      ? styles.inputFontLight
-                      : styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig
-                  ]}
+                <TextInput style={[this.state.light_theme ? styles.inputFontLight : styles.inputFont,
+                                   styles.inputFontExtra, styles.inputTextBig]}
                   onChangeText={story => this.setState({ story })}
                   placeholder={"História"}
                   multiline={true}
                   numberOfLines={20}
-                  placeholderTextColor={
-                    this.state.light_theme ? "#15193c" : "white"
-                  }
+                  placeholderTextColor={this.state.light_theme ? "#15193c" : "white"}
                 />
                 <TextInput
-                  style={[
-                    this.state.light_theme
-                      ? styles.inputFontLight
-                      : styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig
-                  ]}
+                  style={[this.state.light_theme ? styles.inputFontLight : styles.inputFont,
+                          styles.inputFontExtra, styles.inputTextBig]}
                   onChangeText={moral => this.setState({ moral })}
                   placeholder={"Moral da História"}
                   multiline={true}
                   numberOfLines={4}
-                  placeholderTextColor={
-                    this.state.light_theme ? "#15193c" : "white"
-                  }
+                  placeholderTextColor={this.state.light_theme ? "#15193c" : "white"}
                 />
+              </View>
+              <View style={styles.submitButton}>
+                <Button onPress={()=>this.addStory()}
+                        title="Enviar"
+                        color="#841584"/>
               </View>
             </ScrollView>
           </View>
@@ -297,5 +290,10 @@ const styles = StyleSheet.create({
   inputTextBig: {
     textAlignVertical: "top",
     padding: RFValue(5)
+  },
+  submitButton: {
+    marginTop: RFValue(20),
+    alignItems: "center",
+    justifyContent: "center"
   }
 });

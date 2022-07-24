@@ -8,6 +8,7 @@ import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import * as Speech from "expo-speech";
 import firebase from "firebase";
+import StoryCard from "./StoryCard";
 
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf")
@@ -20,7 +21,8 @@ export default class StoryScreen extends Component {
             fontsLoaded: false,
             speakerColor: "gray",
             speakerIcon: "volume-high-outline",
-            light_theme: true
+            light_theme: true,
+            story: this.props.route.params.story,
         };
     }
 
@@ -66,6 +68,13 @@ render() {
         } else if (!this.state.fontsLoaded) {
             return <AppLoading />;
         } else {
+          let preview_images = {
+        image_1: require("../assets/story_image_1.png"),
+        image_2: require("../assets/story_image_2.png"),
+        image_3: require("../assets/story_image_3.png"),
+        image_4: require("../assets/story_image_4.png"),
+        image_5: require("../assets/story_image_5.png")
+      };
         return (
         <View style={this.state.light_theme ? styles.containerLight : styles.container}>
          <SafeAreaView style={styles.droidSafeArea} />
@@ -82,29 +91,29 @@ render() {
           </View>
           <View style={styles.storyContainer}>
             <ScrollView style={this.state.light_theme ? styles.storyCardLight : styles.storyCard}>
-              <Image source={require("../assets/story_image_1.png")}
+              <Image source={preview_images[this.state.story.preview_image]}
                      style={styles.image}></Image>
               <View style={styles.dataContainer}>
                 <View style={styles.titleTextContainer}>
                   <Text style={this.state.light_theme ? styles.storyTitleTextLight : styles.storyTitleText}>
-                    {this.props.route.params.story.title}
+                    {this.state.story.title}
                   </Text>
                   <Text style={this.state.light_theme ? styles.storyAuthorTextLight : styles.storyAuthorText}>
-                    {this.props.route.params.story.author}
+                    {this.state.story.author}
                   </Text>
                   <Text
                     style={this.state.light_theme ? styles.storyAuthorTextLight : styles.storyAuthorText}>
-                    {this.props.route.params.story.created_on}
+                    {this.state.story.created_on}
                   </Text>
                 </View>
                 <View style={styles.iconContainer}>
                   <TouchableOpacity
                     onPress={() =>
                       this.initiateTTS(
-                        this.props.route.params.story.title,
-                        this.props.route.params.story.author,
-                        this.props.route.params.story.story,
-                        this.props.route.params.story.moral,
+                        this.state.story.title,
+                        this.state.story.author,
+                        this.state.story.story,
+                        this.state.story.moral,
                       )
                     }
                   >
@@ -120,10 +129,10 @@ render() {
               <View style={styles.storyTextContainer}>
                 <Text
                   style={this.state.light_theme ? styles.storyTextLight : styles.storyText}>
-                  {this.props.route.params.story.story}
+                  {this.state.story.story}
                 </Text>
                 <Text style={this.state.light_theme ? styles.moralTextLight : styles.moralText}>
-                  Moral da História - {this.props.route.params.story.moral}
+                  Moral da História - {this.state.story.moral}
                 </Text>
               </View>
               <View style={styles.actionContainer}>
