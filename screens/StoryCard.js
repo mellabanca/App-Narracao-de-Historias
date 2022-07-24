@@ -7,7 +7,8 @@ import {
   Platform,
   StatusBar,
   Image,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AppLoading from "expo-app-loading";
@@ -39,7 +40,10 @@ export default class StoryCard extends Component {
       return <AppLoading />;
     } else {
       return (
-        <View style={styles.container}>
+        <TouchableOpacity style={styles.container}
+                          onPress={()=>this.props.navigation.navigate(
+                            "Tela de Histórias", {story: this.props.story}
+                          )}>
           <SafeAreaView style={styles.droidSafeArea}/>
             <View style={styles.cardContainer}>
                 <Image source={require("../assets/story_image_1.png")}
@@ -83,7 +87,7 @@ export default class StoryCard extends Component {
                   </View>
                 </View>
               </View>
-        </View>
+        </TouchableOpacity>
       );
     }
   }
