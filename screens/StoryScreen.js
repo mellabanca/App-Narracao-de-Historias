@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     },
     appTitleText: {
         color: "white",
-        fontSize: RFValue(28),
+        fontSize: RFValue(20),
         fontFamily: "Bubblegum-Sans"
     },
     storyContainer: {
