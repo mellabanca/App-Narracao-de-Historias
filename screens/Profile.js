@@ -70,7 +70,7 @@ export default class Profile extends Component {
       return <AppLoading />
     } else {
       return (
-        <View style={styles.container}>
+        <View style={this.state.light_theme ? styles.containerLight : styles.container}>
           <SafeAreaView style={styles.droidSafeArea}/>
             <View style={styles.appTitle}>
               <View style={styles.appIcon}>
@@ -78,19 +78,19 @@ export default class Profile extends Component {
                        style={styles.imageLogo}></Image>
               </View>
               <View style={styles.appTitleTextContainer}>
-                <Text style={styles.appTitleText}>App Narração de Histórias</Text>
+                <Text style={this.state.light_theme ? styles.appTitleTextLight : styles.appTitleText}>App Narração de Histórias</Text>
               </View>
             </View>
             <View style={styles.screenContainer}>
               <View style={styles.profileImageContainer}>
                 <Image source={{uri: this.state.profile_image}}
                        style={styles.profileImage}></Image>
-                <Text style={styles.nameText}>{this.state.name}</Text>
+                <Text style={this.state.light_theme ? styles.nameTextLight : styles.nameText}>{this.state.name}</Text>
               </View>
               <View style={styles.themeContainer}>
-                <Text style={styles.themeText}>Tema Escuro</Text>
+                <Text style={this.state.light_theme ? styles.themeTextLight : styles.themeText}>Tema Escuro</Text>
                 <Switch style={{transform: [{scaleX: 1.3},{scaleY: 1.3}]}}
-                        trackColor={{false:"#767577",true:"white"}}
+                        trackColor={{false:"#767577",true: this.state.light_theme ? "#eee" : "white"}}
                         thumbColor={this.state.isEnabled ? "#ee8249" : "#f4f3f4"}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={()=>this.toggleSwitch()}
@@ -110,6 +110,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#15193c"
+  },
+  containerLight: {
+    flex: 1,
+    backgroundColor: "white",
   },
   droidSafeArea: {
     marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
@@ -137,6 +141,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(20),
     fontFamily: "Bubblegum-Sans"
   },
+  appTitleTextLight: {
+    color: "#15193c",
+    fontSize: RFValue(20),
+    fontFamily: "Bubblegum-Sans"
+  },
   screenContainer: {
     flex: 0.85
   },
@@ -156,6 +165,12 @@ const styles = StyleSheet.create({
     fontFamily: "Bubblegum-Sans",
     marginTop: RFValue(10)
   },
+  nameTextLight: {
+    color: "#15193c",
+    fontSize: RFValue(30),
+    fontFamily: "Bubblegum-Sans",
+    marginTop: RFValue(10)
+  },
   themeContainer: {
     flex: 0.2,
     flexDirection: "row",
@@ -164,6 +179,12 @@ const styles = StyleSheet.create({
   },
   themeText: {
     color: "white",
+    fontSize: RFValue(30),
+    fontFamily: "Bubblegum-Sans",
+    marginRight: RFValue(15)
+  },
+  themeTextLight: {
+    color: "#15193c",
     fontSize: RFValue(30),
     fontFamily: "Bubblegum-Sans",
     marginRight: RFValue(15)
